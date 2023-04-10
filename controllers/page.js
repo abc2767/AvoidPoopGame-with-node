@@ -1,11 +1,11 @@
 const { User, Post, Hashtag } = require("../models");
 
 exports.renderProfile = (req, res) => {
-    res.render("profile", { title: "내 정보 - NodeBird" });
+    res.render("profile", { title: "내 정보 - 백엔드 연습" });
 };
 
 exports.renderJoin = (req, res) => {
-    res.render("join", { title: "회원가입 - NodeBird" });
+    res.render("join", { title: "회원가입 - 백엔드 연습" });
 };
 
 exports.renderGame = (req, res) => {

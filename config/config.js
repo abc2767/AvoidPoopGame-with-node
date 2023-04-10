@@ -24,3 +24,4 @@ module.exports = {
         logging: false,
     },
 };
+console.log("MYSQL_PASSWORD", process.env.SEQUELIZE_PASSWORD); ///
