@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AvoidPoopGame</title>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+            }
+            canvas {
+                background: #eee;
+                display: block;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="400" height="500"></canvas>
+        <script>
+            let canvas = document.getElementById("myCanvas"); //html의 id를 가져오는 법
+            let context = canvas.getContext("2d"); //2d인지 3d인지 설정
+
+            //let image = new Image();
+            //image.src = "../uploads/character.jpg";
+
+            //let poop = new Image();
+            //poop.src = "../uploads/poop.png";
+
+            let score = 0;
+            function GameObject(src, width, height) {
+                this.x = 0;
+                this.y = 0;
+                this.image = new Image();
+                this.image.src = src;
+                this.width = width;
+                this.height = height;
+                this.direction = 0;
+
+                this.alpha = 1; //투명도
+                this.isObstacle = false; //장애물인지 확인
+            }
+            objectArray = [];
+            const player = new GameObject("/character.jpg", 50, 50);
+            objectArray.push(player);
+            //화면 아래에서 리스폰
+            player.x = canvas.width / 2 - 50;
+            player.y = canvas.height - 100;
+
+            // 1초마다 한번씩 실행
+            setInterval(function () {
+                const newObstacle = new GameObject("/poop.png", 60, 60);
+                objectArray.push(newObstacle);
+                newObstacle.isObstacle = true;
+
+                newObstacle.direction = parseInt(Math.random() * 3);
+                newObstacle.x = Math.random() * 400; //0에서 440사이의 소수 반환
+                newObstacle.y = newObstacle.height;
+                console.log(objectArray);
+            }, 1000);
+
+            function checkCollision(a, b) {
+                return !(a.x > b.x + b.width || a.x + a.width < b.x || a.y > b.y + b.height || a.y + a.height < b.y);
+            }
+            let downKeys = {};
+
+            window.addEventListener("keydown", onKeyDown);
+            window.addEventListener("keyup", onKeyUp);
+
+            function onKeyDown(event) {
+                downKeys[event.code] = true;
+            }
+
+            function onKeyUp(event) {
+                downKeys[event.code] = false;
+            }
+            let gameover = false;
+            window.requestAnimationFrame(run);
+            function run() {
+                if (gameover) {
+                    //배경색 변경
+                    context.fillStyle = "black";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    context.font = "20px malgun gothic"; //폰트의 크기, 글꼴체 지정
+                    context.fillStyle = "red"; //색상지정
+                    context.fillText("game over", canvas.width / 2 - 55, canvas.height / 2);
+                    context.fillText("score : " + score, canvas.width / 2 - 55, canvas.height / 2 + 20);
+                    context.fill();
+                    return;
+                } else {
+                    context.fillStyle = "mistyrose";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    for (let obj of objectArray) {
+                        // 투명도
+                        context.globalAlpha = obj.alpha;
+
+                        context.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+
+                        if (obj === player) {
+                            //사용자 사라짐 방지
+                            if (obj.x <= 0) {
+                                obj.x = canvas.width;
+                            } else if (obj.x >= canvas.width) {
+                                obj.x = 0;
+                            }
+                            if (obj.y <= 0) {
+                                obj.y = canvas.height;
+                            } else if (obj.y >= canvas.height) {
+                                obj.y = 0;
+                            }
+                            continue;
+                        }
+
+                        //장애물이 여러방향에서 날아오다가 벽을 만나면 방향 바꾸기
+                        if (obj.x < 0) {
+                            obj.direction = 0;
+                        } else if (obj.x > canvas.width - 60) {
+                            obj.direction = 1;
+                        }
+
+                        if (obj.isObstacle) {
+                            //장애물 여러방향에서 내려오기
+                            if (obj.direction == 0) {
+                                obj.x += 5;
+                                obj.y += 5;
+                            } else if (obj.direction == 1) {
+                                obj.x -= 5;
+                                obj.y += 5;
+                            } else if (obj.direction == 2) {
+                                obj.y += 5;
+                            }
+                        }
+
+                        if (obj.y == canvas.height) {
+                            //canvas.height로 게임화면 세로사이즈 가져옴
+                            ++score;
+                        }
+
+                        context.font = "20px malgun gothic"; //폰트의 크기, 글꼴체 지정
+                        context.fillStyle = "black"; //색상지정
+                        context.fillText("score : " + score, canvas.width - 100, 30); //점수를 지정한 위치에 찍어준다.
+                        context.fill();
+                        if (downKeys["ArrowLeft"]) player.x -= 3;
+                        if (downKeys["ArrowRight"]) player.x += 3;
+                        if (downKeys["ArrowUp"]) player.y -= 3;
+                        if (downKeys["ArrowDown"]) player.y += 3;
+                        if (checkCollision(player, obj)) {
+                            gameover = true;
+                        } //충돌을 비교하는 것
+                    }
+                }
+                window.requestAnimationFrame(run);
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="timeline">
+    {% if user %}
+    <div></div>
+    {% endif %}
+    <div class="twits">
+        <form id="hashtag-form" action="/hashtag">
+            <input type="text" name="hashtag" placeholder="아이디 순위 검색" />
+            <button class="btn">검색</button>
+        </form>
+    </div>
+    <a href="/game" class="btn">게임하러 가기</a>
+</div>
+{% endblock %} {% block script %}
+<script></script>
+{% endblock %}
